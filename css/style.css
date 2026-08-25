@@ -1,0 +1,714 @@
+/* =========================================================
+   Token system
+   ---------------------------------------------------------
+   Color
+     --bg          #0B0E14  near-black terminal background
+     --panel       #12161F  raised panel surface
+     --line        #232938  hairline borders
+     --amber       #FFB020  primary accent (from the campus banner)
+     --teal        #21E6C1  secondary accent - success / verified
+     --red         #FF4655  error / denied
+     --ink         #E8ECF1  primary text
+     --ink-dim     #8B93A7  secondary text
+   Type
+     display / mono : 'JetBrains Mono' - terminal + data
+     body            : 'Inter' - readable UI copy
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #0B0E14;
+  --panel: #12161F;
+  --panel-2: #171C28;
+  --line: #232938;
+  --amber: #FFB020;
+  --amber-dim: #8A6220;
+  --teal: #21E6C1;
+  --red: #FF4655;
+  --ink: #E8ECF1;
+  --ink-dim: #8B93A7;
+
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Ambient scanline + grid texture behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(232,236,241,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,236,241,0.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0px,
+    rgba(0,0,0,0) 2px,
+    rgba(0,0,0,0.06) 3px
+  );
+  opacity: 0.5;
+}
+
+/* -----------------------------------------------------------
+   Ambient background - binary rain + six living icons
+----------------------------------------------------------- */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ambient-icon {
+  position: absolute;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+/* dense grid of 0/1 that twinkles in brightness, matches reference clip */
+.bit-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  justify-content: start;
+  align-content: start;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.bit-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.04;
+  animation-name: bit-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.bit-dim { color: var(--teal); --peak: 0.14; }
+.bit-mid { color: var(--teal); --peak: 0.26; }
+.bit-bright { color: var(--amber); --peak: 0.42; }
+
+@keyframes bit-twinkle {
+  0%, 100% { opacity: 0.04; }
+  50% { opacity: var(--peak, 0.16); }
+}
+
+.ambient-icon {
+  color: var(--amber);
+  stroke-width: 2.25;
+  opacity: 0.66;
+  filter: drop-shadow(0 0 6px rgba(255, 176, 32, 0.15));
+}
+
+/* robot: eyes blink */
+.robot-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: eye-blink 2.1s ease-in-out infinite;
+}
+.icon-robot .robot-eye:nth-child(3) { animation-delay: 0.08s; }
+
+@keyframes eye-blink {
+  0%, 85%, 100% { transform: scaleY(1); }
+  90% { transform: scaleY(0.12); }
+}
+
+/* paper plane: drifts and banks */
+.icon-plane {
+  animation: plane-drift 6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes plane-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(6px, -5px) rotate(4deg); }
+  50% { transform: translate(-3px, 3px) rotate(-3deg); }
+  75% { transform: translate(4px, 5px) rotate(2deg); }
+}
+
+/* atom: orbits turn slowly */
+.atom-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: atom-turn 9s linear infinite;
+}
+
+@keyframes atom-turn {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* lightbulb: rays blink like a light */
+.bulb-rays {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bulb-blink 2.6s ease-in-out infinite;
+}
+
+@keyframes bulb-blink {
+  0%, 40%, 100% { opacity: 1; }
+  20% { opacity: 0.15; }
+  60% { opacity: 0.15; }
+  80% { opacity: 1; }
+}
+
+/* cloud: gentle bob, smile stays */
+.icon-cloud {
+  animation: cloud-bob 5s ease-in-out infinite;
+}
+
+@keyframes cloud-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* envelope: floats like a letter in the air */
+.icon-envelope {
+  animation: envelope-float 5.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes envelope-float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(0, -10px) rotate(-2deg); }
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 18px;
+}
+
+.screen { width: 100%; max-width: 460px; display: none; }
+#screen-ticket.screen { max-width: 540px; }
+
+.screen.active { display: block; }
+
+/* -----------------------------------------------------------
+   Shared: eyebrow / labels
+----------------------------------------------------------- */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--amber);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.eyebrow .code-tag {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 400;
+  color: var(--ink-dim);
+  letter-spacing: 0.02em;
+}
+
+.blink-slash {
+  display: inline-block;
+  animation: slash-blink 1s steps(1, end) infinite;
+}
+
+@keyframes slash-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* -----------------------------------------------------------
+   Screen 1 - Access terminal (ID / Name entry)
+----------------------------------------------------------- */
+.terminal {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 28px 26px 26px;
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+}
+
+.terminal-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 22px;
+  gap: 8px;
+}
+
+.terminal-head .dept {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--amber);
+  text-align: center;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+}
+
+.brand {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.brand span { color: var(--amber); }
+
+h1.title {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: 0.01em;
+  margin: 0 0 26px;
+  color: var(--ink);
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 7px;
+}
+
+.field input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 13px 14px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field input::placeholder { color: #4A5164; }
+
+#input-id::placeholder {
+  font-family: var(--font-sans);
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+.field input:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px rgba(255,176,32,0.12);
+}
+
+.field.error input {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(255,70,85,0.12);
+}
+
+.hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #4A5164;
+  margin-top: 6px;
+}
+
+.btn {
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:active { transform: scale(0.98); }
+
+.btn-primary {
+  background: var(--amber);
+  color: #16110A;
+  margin-top: 6px;
+}
+
+.btn-primary:hover { filter: brightness(1.08); }
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  margin-top: 10px;
+}
+
+.btn-ghost:hover { color: var(--ink); border-color: var(--ink-dim); }
+
+.status-line {
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  min-height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-line.ok { color: var(--teal); }
+.status-line.fail { color: var(--red); }
+
+.shake { animation: shake 0.4s ease; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* -----------------------------------------------------------
+   Screen 2 - Ticket stub (granted)
+----------------------------------------------------------- */
+.ticket {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+  animation: ticket-in 0.5s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes ticket-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ticket-top {
+  padding: 30px 30px 22px;
+  text-align: center;
+}
+
+.granted-mark {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  border: 2px solid var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal);
+  box-shadow: 0 0 20px rgba(33,230,193,0.25);
+}
+
+.granted-label {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--teal);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.holder-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 4px 0 2px;
+}
+
+.holder-id {
+  font-family: var(--font-mono);
+  color: var(--ink-dim);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+
+.ticket-perforation {
+  position: relative;
+  height: 0;
+  border-top: 1px dashed var(--line);
+  margin: 4px 0;
+}
+
+.ticket-perforation::before,
+.ticket-perforation::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  background: var(--bg);
+  border-radius: 50%;
+}
+
+.ticket-perforation::before { left: -10px; }
+.ticket-perforation::after { right: -10px; }
+
+.ticket-bottom {
+  padding: 20px 30px 26px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 12px;
+}
+
+.ticket-bottom .kv label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 4px;
+}
+
+.ticket-bottom .kv strong {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.ticket-actions { padding: 0 30px 30px; }
+
+/* -----------------------------------------------------------
+   Screen 3 - Motion reveal
+----------------------------------------------------------- */
+.reveal {
+  width: 100%;
+  max-width: 640px;
+  text-align: center;
+}
+
+.reveal-eyebrow {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--amber);
+  text-shadow: 0 0 14px rgba(255,176,32,0.35);
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: fade-up 0.6s ease forwards;
+  animation-delay: 0.1s;
+}
+
+.glitch-wrap {
+  margin-bottom: 8px;
+}
+
+.glitch {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  position: relative;
+  display: block;
+  opacity: 0;
+}
+
+.glitch.line1 {
+  font-size: clamp(30px, 8vw, 52px);
+  color: var(--ink);
+}
+
+.glitch.line2 {
+  font-size: clamp(30px, 8vw, 52px);
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+.glitch.batch {
+  font-size: clamp(38px, 10vw, 64px);
+  color: var(--amber);
+  margin-top: 6px;
+}
+
+.glitch.run {
+  animation:
+    glitch-settle 0.9s steps(1, end) forwards,
+    glitch-loop 4.5s ease-in-out 1.1s infinite;
+}
+
+/* subtle periodic flicker, kicks in once the settle animation finishes */
+@keyframes glitch-loop {
+  0%, 90%, 100% { transform: translate(0); text-shadow: none; }
+  91% { transform: translate(-3px, 1px); text-shadow: 2px 0 var(--red), -2px 0 var(--teal); }
+  93% { transform: translate(3px, -1px); text-shadow: -2px 0 var(--red), 2px 0 var(--teal); }
+  95% { transform: translate(-1px, 0); text-shadow: 1px 0 var(--red), -1px 0 var(--teal); }
+  97% { transform: translate(0); text-shadow: none; }
+}
+
+@keyframes glitch-settle {
+  0%   { opacity: 0; transform: translateX(0); }
+  4%   { opacity: 1; transform: translate(-4px, 1px); text-shadow: 3px 0 var(--red), -3px 0 var(--teal); }
+  8%   { transform: translate(3px, -1px); text-shadow: -3px 0 var(--red), 3px 0 var(--teal); }
+  12%  { transform: translate(-2px, 0); text-shadow: 2px 0 var(--red), -2px 0 var(--teal); }
+  16%  { transform: translate(2px, 1px); text-shadow: -2px 0 var(--red), 2px 0 var(--teal); }
+  22%  { transform: translate(0); text-shadow: none; }
+  55%  { transform: translate(0); text-shadow: none; }
+  58%  { transform: translate(-2px, 0); text-shadow: 2px 0 var(--red), -2px 0 var(--teal); }
+  61%  { transform: translate(0); text-shadow: none; }
+  100% { opacity: 1; transform: translate(0); text-shadow: none; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal-details {
+  margin-top: 34px;
+  border-top: 1px solid var(--line);
+  padding-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  opacity: 0;
+}
+
+.reveal-details.show {
+  animation: fade-up 0.7s ease forwards;
+}
+
+.reveal-details .item label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 6px;
+}
+
+.reveal-details .item strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.reveal-details .item strong.accent { color: var(--teal); }
+
+.organiser {
+  margin-top: 30px;
+  text-align: center;
+  opacity: 0;
+}
+
+.organiser.show {
+  animation: fade-up 0.7s ease forwards;
+}
+
+.organiser-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 4px;
+}
+
+.organiser-name {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--amber);
+  margin-bottom: 14px;
+}
+
+.organiser-logo {
+  display: block;
+  margin: 0 auto;
+  max-width: 96px;
+  height: auto;
+}
+
+.reveal-actions {
+  margin-top: 30px;
+  opacity: 0;
+}
+
+.reveal-actions.show {
+  animation: fade-up 0.6s ease forwards;
+}
+
+@media (max-width: 480px) {
+  .reveal-details { grid-template-columns: 1fr; gap: 16px; text-align: left; }
+  .ticket-bottom { grid-template-columns: 1fr; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* Keyboard focus visibility */
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.field input:focus-visible {
+  outline: none;
+}

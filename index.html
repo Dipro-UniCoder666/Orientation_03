@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CSE-03 Orientation Access</title>
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png" />
+<link rel="apple-touch-icon" href="assets/favicon-192.png" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ================================================================
+     Ambient background - binary rain + six hand-drawn icons, animated.
+     Purely decorative, sits behind the app content.
+================================================================= -->
+<div class="ambient-bg" aria-hidden="true">
+
+  <!-- dense binary grid, twinkling brightness, built by js/background.js -->
+  <div id="bit-grid" class="bit-grid"></div>
+
+  <!-- robot: eyes blink -->
+  <svg class="ambient-icon icon-robot" style="top:18%; left:22%; width:58px" viewBox="0 0 64 64">
+    <line x1="32" y1="4" x2="32" y2="12"/>
+    <circle cx="32" cy="4" r="2.5" fill="currentColor" stroke="none"/>
+    <rect x="10" y="12" width="44" height="34" rx="10"/>
+    <circle class="robot-eye" cx="24" cy="30" r="4" fill="currentColor" stroke="none"/>
+    <circle class="robot-eye" cx="40" cy="30" r="4" fill="currentColor" stroke="none"/>
+    <path d="M23 40h18" stroke-linecap="round"/>
+    <path d="M4 24v10M60 24v10" stroke-linecap="round"/>
+  </svg>
+
+  <!-- paper plane: drifts -->
+  <svg class="ambient-icon icon-plane" style="top:36%; left:17%; width:46px" viewBox="0 0 64 64">
+    <path d="M6 34 L58 8 L34 58 L28 36 Z"/>
+    <path d="M28 36 L58 8"/>
+  </svg>
+
+  <!-- atom: orbits turn slowly -->
+  <svg class="ambient-icon icon-atom" style="top:74%; left:22%; width:46px" viewBox="0 0 64 64">
+    <g class="atom-spin">
+      <ellipse cx="32" cy="32" rx="26" ry="10"/>
+      <ellipse cx="32" cy="32" rx="26" ry="10" transform="rotate(60 32 32)"/>
+      <ellipse cx="32" cy="32" rx="26" ry="10" transform="rotate(120 32 32)"/>
+    </g>
+    <circle cx="32" cy="32" r="3.5" fill="currentColor" stroke="none"/>
+  </svg>
+
+  <!-- lightbulb: rays blink -->
+  <svg class="ambient-icon icon-bulb" style="top:12%; left:73%; width:44px" viewBox="0 0 64 64">
+    <g class="bulb-rays" stroke-linecap="round">
+      <line x1="32" y1="0" x2="32" y2="6"/>
+      <line x1="12" y1="8" x2="16" y2="12"/>
+      <line x1="52" y1="8" x2="48" y2="12"/>
+      <line x1="4" y1="24" x2="10" y2="24"/>
+      <line x1="60" y1="24" x2="54" y2="24"/>
+    </g>
+    <circle cx="32" cy="26" r="16"/>
+    <path d="M25 40h14M27 46h10" stroke-linecap="round"/>
+    <path d="M26 34c2 2 10 2 12 0" stroke-linecap="round"/>
+  </svg>
+
+  <!-- cloud: bobs, smiling -->
+  <svg class="ambient-icon icon-cloud" style="top:40%; left:76%; width:52px" viewBox="0 0 64 64">
+    <path d="M16 42a10 10 0 0 1-2-19.8A13 13 0 0 1 39 16a10.5 10.5 0 0 1 9 18.6A9 9 0 0 1 46 42Z"/>
+    <circle cx="24" cy="30" r="2" fill="currentColor" stroke="none"/>
+    <circle cx="36" cy="30" r="2" fill="currentColor" stroke="none"/>
+    <path d="M23 35c3 3 11 3 14 0" stroke-linecap="round"/>
+  </svg>
+
+  <!-- envelope: floats -->
+  <svg class="ambient-icon icon-envelope" style="top:70%; left:74%; width:50px" viewBox="0 0 64 64">
+    <rect x="6" y="16" width="52" height="36" rx="3"/>
+    <path d="M6 18 L32 40 L58 18"/>
+  </svg>
+
+</div>
+
+<div class="app">
+
+  <!-- ============================================================
+       SCREEN 1 - Access terminal (ID + name entry)
+  ============================================================ -->
+  <section id="screen-login" class="screen active">
+    <div class="terminal">
+      <div class="terminal-head">
+        <div class="brand">ORIENTATION<span>_</span>ACCESS</div>
+        <div class="dept">PIROJPUR SCIENCE AND TECHNOLOGY UNIVERSITY<br>DEPARTMENT OF CSE</div>
+      </div>
+
+      <div class="eyebrow"><span class="code-tag">&lt;</span>IDENTITY VERIFICATION<span class="code-tag"><span class="blink-slash">/</span>&gt;</span></div>
+      <h1 class="title">Enter your Student ID and Name</h1>
+
+      <form id="login-form" novalidate>
+        <div class="field" id="field-id">
+          <label for="input-id">Student ID</label>
+          <input type="text" id="input-id" placeholder="B250201001" autocomplete="off" maxlength="10" />
+        </div>
+
+        <div class="field" id="field-name">
+          <label for="input-name">Full Name</label>
+          <input type="text" id="input-name" placeholder="" autocomplete="off" />
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-verify">Book Your Ticket</button>
+        <div class="status-line" id="status-line"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 2 - Ticket stub (access granted)
+  ============================================================ -->
+  <section id="screen-ticket" class="screen">
+    <div class="ticket">
+      <div class="ticket-top">
+        <div class="granted-mark">✓</div>
+        <div class="granted-label">ACCESS GRANTED</div>
+        <div class="holder-name" id="ticket-name">-</div>
+        <div class="holder-id" id="ticket-id">-</div>
+      </div>
+
+      <div class="ticket-perforation"></div>
+
+      <div class="ticket-bottom">
+        <div class="kv">
+          <label>Event</label>
+          <strong id="ticket-event">-</strong>
+        </div>
+        <div class="kv">
+          <label>Batch</label>
+          <strong id="ticket-batch">-</strong>
+        </div>
+        <div class="kv">
+          <label>Date</label>
+          <strong id="ticket-date">-</strong>
+        </div>
+        <div class="kv">
+          <label>Venue</label>
+          <strong id="ticket-venue">-</strong>
+        </div>
+      </div>
+
+      <div class="ticket-actions">
+        <button class="btn btn-primary" id="btn-enter">Enter Orientation Feed</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 3 - Motion reveal
+  ============================================================ -->
+  <section id="screen-reveal" class="screen">
+    <div class="reveal">
+      <div class="reveal-eyebrow" id="reveal-eyebrow">- WELCOME, <span id="reveal-name">STUDENT</span> 🌻 -</div>
+
+      <div class="glitch-wrap">
+        <span class="glitch line1" id="glitch-line1">DEPARTMENTAL</span>
+        <span class="glitch line2" id="glitch-line2">ORIENTATION</span>
+        <span class="glitch batch" id="glitch-batch">CSE - 03</span>
+      </div>
+
+      <div class="reveal-details" id="reveal-details">
+        <div class="item">
+          <label>Venue</label>
+          <strong id="rd-venue1">-</strong>
+          <strong id="rd-venue2">-</strong>
+        </div>
+        <div class="item">
+          <label>Date</label>
+          <strong class="accent" id="rd-date">-</strong>
+          <strong id="rd-day">-</strong>
+        </div>
+        <div class="item">
+          <label>Doors Open</label>
+          <strong id="rd-doors">-</strong>
+        </div>
+      </div>
+
+      <div class="organiser" id="reveal-organiser">
+        <div class="organiser-label">Organised By:</div>
+        <div class="organiser-name">ALGORION - 02</div>
+        <img class="organiser-logo" src="assets/algorion-logo.png" alt="ALGORION - 02 logo" onerror="this.style.display='none'" />
+      </div>
+
+      <div class="reveal-actions" id="reveal-actions">
+        <button class="btn btn-ghost" id="btn-back">← Back to ticket</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="js/background.js"></script>
+<script src="js/config.js"></script>
+<script src="js/students.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

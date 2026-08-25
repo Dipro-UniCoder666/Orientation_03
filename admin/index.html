@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Check-in Records — Admin</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png" />
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    background: #0B0E14;
+    color: #E8ECF1;
+    padding: 32px 18px;
+  }
+  h1 {
+    font-size: 18px;
+    margin: 0 0 4px;
+  }
+  .sub {
+    color: #8B93A7;
+    font-size: 12px;
+    margin-bottom: 24px;
+  }
+  .stat {
+    display: inline-block;
+    background: #12161F;
+    border: 1px solid #232938;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+  .stat strong { color: #FFB020; }
+  table {
+    width: 100%;
+    max-width: 760px;
+    border-collapse: collapse;
+    background: #12161F;
+    border: 1px solid #232938;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid #232938;
+  }
+  th {
+    color: #8B93A7;
+    text-transform: uppercase;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #171C28; }
+  .empty, .error {
+    color: #8B93A7;
+    font-size: 13px;
+    padding: 20px 0;
+  }
+  .error { color: #FF4655; }
+  button {
+    background: #FFB020;
+    color: #12161F;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  button:hover { filter: brightness(1.05); }
+</style>
+</head>
+<body>
+
+<h1>CSE-03 Orientation — Check-in Records</h1>
+<div class="sub">Live submissions from the access terminal</div>
+
+<button id="btn-refresh">↻ Refresh</button>
+<button id="btn-csv">⬇ Export CSV</button>
+
+<div id="stat" class="stat" style="display:none">
+  <strong id="count">0</strong> check-ins recorded
+</div>
+
+<div id="content">Loading…</div>
+
+<script>
+  const contentEl = document.getElementById("content");
+  const statEl = document.getElementById("stat");
+  const countEl = document.getElementById("count");
+  let lastRecords = [];
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function render(records) {
+    lastRecords = records;
+    if (!records.length) {
+      statEl.style.display = "none";
+      contentEl.innerHTML = '<div class="empty">No check-ins yet.</div>';
+      return;
+    }
+
+    statEl.style.display = "inline-block";
+    countEl.textContent = records.length;
+
+    const rows = records
+      .slice()
+      .reverse()
+      .map(function (r) {
+        const time = new Date(r.at).toLocaleString();
+        return (
+          "<tr><td>" +
+          escapeHtml(r.id) +
+          "</td><td>" +
+          escapeHtml(r.name) +
+          "</td><td>" +
+          escapeHtml(time) +
+          "</td></tr>"
+        );
+      })
+      .join("");
+
+    contentEl.innerHTML =
+      "<table><thead><tr><th>Student ID</th><th>Name</th><th>Checked in</th></tr></thead><tbody>" +
+      rows +
+      "</tbody></table>";
+  }
+
+  function load() {
+    contentEl.innerHTML = "Loading…";
+    fetch("/api/checkin")
+      .then(function (res) {
+        if (res.status === 401) {
+          throw new Error("Unauthorized. Refresh and enter the admin credentials when prompted.");
+        }
+        if (!res.ok) throw new Error("Request failed (" + res.status + ").");
+        return res.json();
+      })
+      .then(function (data) {
+        if (!data.ok) throw new Error(data.error || "Unknown error.");
+        render(data.records || []);
+      })
+      .catch(function (err) {
+        contentEl.innerHTML = '<div class="error">' + escapeHtml(err.message) + "</div>";
+      });
+  }
+
+  function downloadCsv() {
+    if (!lastRecords.length) return;
+    const header = "Student ID,Name,Checked In\n";
+    const rows = lastRecords
+      .map(function (r) {
+        const time = new Date(r.at).toISOString();
+        const safe = function (s) {
+          return '"' + String(s).replace(/"/g, '""') + '"';
+        };
+        return [safe(r.id), safe(r.name), safe(time)].join(",");
+      })
+      .join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "checkins.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById("btn-refresh").addEventListener("click", load);
+  document.getElementById("btn-csv").addEventListener("click", downloadCsv);
+
+  load();
+</script>
+</body>
+</html>
