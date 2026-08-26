@@ -447,8 +447,8 @@ h1.title {
 }
 
 .granted-mark {
-  width: 46px;
-  height: 46px;
+  width: 56px;
+  height: 56px;
   margin: 0 auto 14px;
   border-radius: 50%;
   border: 2px solid var(--teal);
@@ -456,6 +456,10 @@ h1.title {
   align-items: center;
   justify-content: center;
   color: var(--teal);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   box-shadow: 0 0 20px rgba(33,230,193,0.25);
 }
 
@@ -694,9 +698,79 @@ h1.title {
 }
 
 @media (max-width: 480px) {
-  .reveal-details { grid-template-columns: 1fr; gap: 16px; text-align: left; }
+  .reveal-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    text-align: left;
+  }
+  .reveal-details .item:nth-child(3) {
+    grid-column: 1 / -1;
+    text-align: center;
+  }
   .ticket-bottom { grid-template-columns: 1fr; }
+
+  /* Screens 1 (login) and 2 (ticket) go glass on mobile so the six
+     background icons stay visible behind the panel, and everything
+     scales down to remove the empty padding seen on small screens. */
+  .terminal,
+  .ticket {
+    background: rgba(18, 22, 31, 0.38);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(255, 176, 32, 0.22);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.03) inset,
+      0 20px 45px -20px rgba(0,0,0,0.55);
+  }
+
+  .terminal { padding: 22px 18px 20px; }
+
+  .terminal-head .brand { font-size: 13px; }
+  .terminal-head .dept { font-size: 10.5px; }
+  .eyebrow { font-size: 10.5px; letter-spacing: 0.14em; }
+  .title { font-size: 20px; }
+
+  .field label { font-size: 10.5px; }
+  .field input { font-size: 13.5px; padding: 12px 14px; }
+  .btn-primary { font-size: 12.5px; padding: 13px 18px; }
+
+  .ticket-top { padding: 22px 18px 16px; }
+  .ticket-bottom { padding: 16px 18px 20px; gap: 14px; }
+  .ticket-actions { padding: 0 18px 22px; }
+
+  .granted-mark { width: 46px; height: 46px; font-size: 12.5px; }
+  .granted-label { font-size: 11px; }
+  .holder-name { font-size: 19px; }
+  .holder-id { font-size: 12px; }
+
+  .ticket-bottom .kv label { font-size: 10px; }
+  .ticket-bottom .kv strong { font-size: 12.5px; }
+
+  .terminal .title,
+  .terminal-head .brand,
+  .terminal-head .dept,
+  .eyebrow,
+  .field label,
+  .field input,
+  .ticket-top .granted-label,
+  .ticket-top .holder-name,
+  .ticket-top .holder-id,
+  .ticket-bottom .kv label,
+  .ticket-bottom .kv strong {
+    text-shadow: 0 1px 3px rgba(0,0,0,0.55), 0 0 14px rgba(0,0,0,0.35);
+  }
+
+  .btn-primary {
+    box-shadow: 0 0 18px rgba(255,176,32,0.35), 0 8px 20px -8px rgba(0,0,0,0.5);
+  }
+
+  /* Let the ambient icons read clearly against the glass panels. */
+  .ambient-icon {
+    opacity: 0.9;
+  }
 }
+
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
