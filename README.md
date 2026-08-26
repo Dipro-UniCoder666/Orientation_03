@@ -6,6 +6,8 @@ A small web app with three jobs:
 2. Reveal the event details through a glitch-text motion sequence.
 3. Record every successful check-in to a database, viewable on a
    password-protected `/admin` page (only works once deployed on Vercel).
+   Checking in again with the same Student ID overwrites that person's
+   row (keeping the latest timestamp) rather than adding a duplicate.
 
 ## Structure
 

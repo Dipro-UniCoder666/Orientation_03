@@ -1,8 +1,9 @@
 /**
  * api/checkin.js
  * ---------------
- * POST { id, name } -> stores one check-in record in Upstash Redis.
- * GET  (with admin auth) -> returns all recorded check-ins as JSON.
+ * POST { id, name } -> records/overwrites a check-in for this Student ID.
+ * GET  (with admin auth) -> returns one record per Student ID, using
+ *                            the most recent check-in time for each.
  *
  * This file only runs on Vercel (serverless function). It does nothing
  * when the site is opened as plain static HTML (e.g. via a local
@@ -13,6 +14,11 @@
  * connection as either UPSTASH_REDIS_REST_URL/TOKEN or the legacy
  * KV_REST_API_URL/TOKEN names depending on how it was provisioned -
  * both are checked below so this works either way.
+ *
+ * Data model: a single Redis hash (checkins:byId) where each field is
+ * a Student ID and each value is the JSON record for that student's
+ * latest check-in. Checking in again with the same ID simply
+ * overwrites that field - so /admin always shows one row per person.
  */
 
 import { Redis } from "@upstash/redis";
@@ -22,7 +28,7 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
 });
 
-const LIST_KEY = "checkins:list";
+const HASH_KEY = "checkins:byId";
 
 function checkAdminAuth(req) {
   const header = req.headers.authorization || "";
@@ -50,13 +56,16 @@ export default async function handler(req, res) {
         return;
       }
 
+      const cleanId = id.trim().toUpperCase();
       const record = {
-        id: id.trim().toUpperCase(),
+        id: cleanId,
         name: name.trim(),
         at: new Date().toISOString(),
       };
 
-      await redis.rpush(LIST_KEY, JSON.stringify(record));
+      // hset on an existing field overwrites it - this is what gives
+      // "one row per person, latest timestamp wins" in /admin.
+      await redis.hset(HASH_KEY, { [cleanId]: JSON.stringify(record) });
 
       res.status(200).json({ ok: true });
     } catch (err) {
@@ -73,8 +82,8 @@ export default async function handler(req, res) {
     }
 
     try {
-      const raw = await redis.lrange(LIST_KEY, 0, -1);
-      const records = raw
+      const all = await redis.hgetall(HASH_KEY);
+      const records = Object.values(all || {})
         .map((r) => {
           if (r && typeof r === "object") return r; // already deserialized
           try {
@@ -83,7 +92,8 @@ export default async function handler(req, res) {
             return null;
           }
         })
-        .filter(Boolean);
+        .filter(Boolean)
+        .sort((a, b) => new Date(b.at) - new Date(a.at));
 
       res.status(200).json({ ok: true, records });
     } catch (err) {

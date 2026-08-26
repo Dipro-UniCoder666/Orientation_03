@@ -116,8 +116,6 @@
     countEl.textContent = records.length;
 
     const rows = records
-      .slice()
-      .reverse()
       .map(function (r) {
         const time = new Date(r.at).toLocaleString();
         return (

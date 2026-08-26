@@ -54,6 +54,4 @@ const STUDENTS = [
   { id: "B250201038", name: "Abir Hossen" },
   { id: "B250201039", name: "Ahmed Nuhash Kabir" },
   { id: "B250201040", name: "Md. Shamim" },
-  { id: "B250201041", name: "Pritylota Roy" },
-  { id: "B250201042", name: "Anup Roy" },
 ];
