@@ -710,29 +710,30 @@ h1.title {
 
   /* Nudge the six ambient icons further toward the edges and slightly
      up/down so they sit clear of the centered glass panel instead of
-     bunching near it, and dial back their opacity so they read as
-     background texture rather than foreground clutter. */
-  .icon-robot { top: 12% !important; left: 10% !important; }
-  .icon-plane { left: 6% !important; }
-  .icon-atom  { left: 8% !important; }
-  .icon-bulb    { top: 6% !important; left: 82% !important; }
-  .icon-cloud   { left: 85% !important; }
-  .icon-envelope { left: 84% !important; }
+     bunching near it. Opacity is raised (not lowered) here because a
+     near-invisible glass panel needs the icons to carry more visual
+     weight on their own to still read as present. */
+  .icon-robot { top: 12% !important; left: 8% !important; }
+  .icon-plane { left: 4% !important; }
+  .icon-atom  { left: 6% !important; }
+  .icon-bulb     { top: 6% !important; left: 84% !important; }
+  .icon-cloud    { left: 88% !important; }
+  .icon-envelope { left: 86% !important; }
 
-  .ambient-icon { opacity: 0.55; }
+  .ambient-icon { opacity: 0.85; }
 
   /* Screens 1 (login) and 2 (ticket) go glass on mobile so the six
-     background icons stay visible behind the panel, and everything
-     scales down to remove the empty padding seen on small screens. */
+     background icons and binary rain stay visible behind the panel.
+     Panel fill is almost fully transparent; only a hairline border
+     and a very soft shadow mark where the panel is, so it doesn't
+     read as a solid block over the background. */
   .terminal,
   .ticket {
-    background: rgba(18, 22, 31, 0.01);
-    backdrop-filter: blur(3px) saturate(140%);
-    -webkit-backdrop-filter: blur(6px) saturate(140%);
-    border: 1px solid rgba(255, 176, 32, 0.22);
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,0.03) inset,
-      0 20px 45px -20px rgba(0,0,0,0.55);
+    background: rgba(18, 22, 31, 0.06);
+    backdrop-filter: blur(2px) saturate(120%);
+    -webkit-backdrop-filter: blur(2px) saturate(120%);
+    border: 1px solid rgba(255, 176, 32, 0.28);
+    box-shadow: 0 8px 24px -16px rgba(0,0,0,0.4);
   }
 
   .terminal { padding: 22px 18px 20px; }
@@ -743,7 +744,11 @@ h1.title {
   .title { font-size: 20px; }
 
   .field label { font-size: 10.5px; }
-  .field input { font-size: 13.5px; padding: 12px 14px; }
+  .field input {
+    font-size: 13.5px;
+    padding: 12px 14px;
+    background: rgba(11, 14, 20, 0.55);
+  }
   .btn-primary { font-size: 12.5px; padding: 13px 18px; }
 
   .ticket-top { padding: 22px 18px 16px; }
@@ -769,7 +774,7 @@ h1.title {
   .ticket-top .holder-id,
   .ticket-bottom .kv label,
   .ticket-bottom .kv strong {
-    text-shadow: 0 1px 3px rgba(0,0,0,0.55), 0 0 14px rgba(0,0,0,0.35);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.85), 0 0 16px rgba(0,0,0,0.6);
   }
 
   .btn-primary {
