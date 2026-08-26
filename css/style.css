@@ -726,7 +726,7 @@ h1.title {
      scales down to remove the empty padding seen on small screens. */
   .terminal,
   .ticket {
-    background: rgba(18, 22, 31, 0.03);
+    background: rgba(18, 22, 31, 0.01);
     backdrop-filter: blur(3px) saturate(140%);
     -webkit-backdrop-filter: blur(6px) saturate(140%);
     border: 1px solid rgba(255, 176, 32, 0.22);
