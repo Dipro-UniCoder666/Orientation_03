@@ -1,15 +1,26 @@
 /**
  * api/checkin.js
  * ---------------
- * POST { id, name } -> stores one check-in record in Vercel KV.
+ * POST { id, name } -> stores one check-in record in Upstash Redis.
  * GET  (with admin auth) -> returns all recorded check-ins as JSON.
  *
  * This file only runs on Vercel (serverless function). It does nothing
  * when the site is opened as plain static HTML (e.g. via a local
  * python http.server) - the front-end simply won't call it there.
+ *
+ * Storage: Upstash Redis, connected via the Vercel Marketplace
+ * ("Storage" tab -> Add a Redis database). Vercel injects the
+ * connection as either UPSTASH_REDIS_REST_URL/TOKEN or the legacy
+ * KV_REST_API_URL/TOKEN names depending on how it was provisioned -
+ * both are checked below so this works either way.
  */
 
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
+});
 
 const LIST_KEY = "checkins:list";
 
