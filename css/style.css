@@ -700,24 +700,35 @@ h1.title {
 @media (max-width: 480px) {
   .reveal-details {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     text-align: left;
   }
-  .reveal-details .item:nth-child(3) {
-    grid-column: 1 / -1;
-    text-align: center;
-  }
+  .reveal-details .item label { font-size: 9.5px; }
+  .reveal-details .item strong { font-size: 12px; white-space: normal; }
   .ticket-bottom { grid-template-columns: 1fr; }
+
+  /* Nudge the six ambient icons further toward the edges and slightly
+     up/down so they sit clear of the centered glass panel instead of
+     bunching near it, and dial back their opacity so they read as
+     background texture rather than foreground clutter. */
+  .icon-robot { top: 12% !important; left: 10% !important; }
+  .icon-plane { left: 6% !important; }
+  .icon-atom  { left: 8% !important; }
+  .icon-bulb    { top: 6% !important; left: 82% !important; }
+  .icon-cloud   { left: 85% !important; }
+  .icon-envelope { left: 84% !important; }
+
+  .ambient-icon { opacity: 0.55; }
 
   /* Screens 1 (login) and 2 (ticket) go glass on mobile so the six
      background icons stay visible behind the panel, and everything
      scales down to remove the empty padding seen on small screens. */
   .terminal,
   .ticket {
-    background: rgba(18, 22, 31, 0.38);
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    background: rgba(18, 22, 31, 0.16);
+    backdrop-filter: blur(6px) saturate(140%);
+    -webkit-backdrop-filter: blur(6px) saturate(140%);
     border: 1px solid rgba(255, 176, 32, 0.22);
     box-shadow:
       0 0 0 1px rgba(255,255,255,0.03) inset,
@@ -763,11 +774,6 @@ h1.title {
 
   .btn-primary {
     box-shadow: 0 0 18px rgba(255,176,32,0.35), 0 8px 20px -8px rgba(0,0,0,0.5);
-  }
-
-  /* Let the ambient icons read clearly against the glass panels. */
-  .ambient-icon {
-    opacity: 0.9;
   }
 }
 
