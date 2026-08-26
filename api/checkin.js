@@ -56,11 +56,11 @@ export default async function handler(req, res) {
         at: new Date().toISOString(),
       };
 
-      await kv.rpush(LIST_KEY, JSON.stringify(record));
+      await redis.rpush(LIST_KEY, JSON.stringify(record));
 
       res.status(200).json({ ok: true });
     } catch (err) {
-      res.status(500).json({ ok: false, error: "Server error." });
+      res.status(500).json({ ok: false, error: "Server error: " + (err && err.message ? err.message : String(err)) });
     }
     return;
   }
@@ -73,18 +73,21 @@ export default async function handler(req, res) {
     }
 
     try {
-      const raw = await kv.lrange(LIST_KEY, 0, -1);
-      const records = raw.map((r) => {
-        try {
-          return JSON.parse(r);
-        } catch {
-          return null;
-        }
-      }).filter(Boolean);
+      const raw = await redis.lrange(LIST_KEY, 0, -1);
+      const records = raw
+        .map((r) => {
+          if (r && typeof r === "object") return r; // already deserialized
+          try {
+            return JSON.parse(r);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
 
       res.status(200).json({ ok: true, records });
     } catch (err) {
-      res.status(500).json({ ok: false, error: "Server error." });
+      res.status(500).json({ ok: false, error: "Server error: " + (err && err.message ? err.message : String(err)) });
     }
     return;
   }
