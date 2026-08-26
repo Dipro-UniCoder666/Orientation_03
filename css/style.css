@@ -698,12 +698,13 @@ h1.title {
 }
 
 @media (max-width: 480px) {
-  .reveal-details {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    text-align: left;
+    .reveal-details {
+    display: flex;
+    justify-content: center;
+    gap: 26px;
+    text-align: center;
   }
+  .reveal-details .item { flex: 0 1 auto; }
   .reveal-details .item label { font-size: 9.5px; }
   .reveal-details .item strong { font-size: 12px; white-space: normal; }
   .ticket-bottom { grid-template-columns: 1fr; }
@@ -730,8 +731,8 @@ h1.title {
   .terminal,
   .ticket {
     background: rgba(18, 22, 31, 0.06);
-    backdrop-filter: blur(2px) saturate(120%);
-    -webkit-backdrop-filter: blur(2px) saturate(120%);
+    backdrop-filter: blur(1px) saturate(120%);
+    -webkit-backdrop-filter: blur(1px) saturate(120%);
     border: 1px solid rgba(255, 176, 32, 0.28);
     box-shadow: 0 8px 24px -16px rgba(0,0,0,0.4);
   }
