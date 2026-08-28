@@ -38,7 +38,7 @@
       cell.className = "bit-cell " + pickTier();
       cell.textContent = Math.random() < 0.5 ? "0" : "1";
       cell.style.animationDelay = (Math.random() * 6).toFixed(2) + "s";
-      cell.style.animationDuration = (3 + Math.random() * 3).toFixed(2) + "s";
+      cell.style.animationDuration = (1 + Math.random() * 1).toFixed(2) + "s";
       frag.appendChild(cell);
     }
 
