@@ -16,5 +16,5 @@ const EVENT = {
   day: "SUNDAY",
   venuePrimary: "Academic Building",
   venueSecondary: "Library Room",
-  doorsOpen: "9:00 AM",
+  doorsOpen: "9:30 AM",
 };
