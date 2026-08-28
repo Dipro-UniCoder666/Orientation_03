@@ -11,6 +11,9 @@
  * Matching rules (see js/app.js -> verifyStudent):
  *   - id must match exactly (not case sensitive)
  *   - name must match exactly, ignoring extra spaces and letter case
+ *     (punctuation like periods IS significant - "Md" and "Md." are
+ *     treated as different names, so keep this list exactly as the
+ *     roster spells each name)
  */
 
 const STUDENTS = [
