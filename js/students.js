@@ -28,7 +28,7 @@ const STUDENTS = [
   { id: "B250201012", name: "Md. Mehedi Hasan" },
   { id: "B250201013", name: "Md. Arafat Hossain" },
   { id: "B250201014", name: "Anupam Chandra" },
-  { id: "B250201015", name: "Md Joyel Ahmed" },
+  { id: "B250201015", name: "Md. Joyel Ahmed" },
   { id: "B250201016", name: "Shahed Ali" },
   { id: "B250201017", name: "Sujan Mia" },
   { id: "B250201018", name: "Ishrat Mahzabin" },
